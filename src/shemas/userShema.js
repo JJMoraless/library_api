@@ -10,7 +10,7 @@ export const postUserShema = Joi.object({
   username: username.required(),
   email: email.required(),
   password: password.required(),
-  role: Joi.string().valid("admin", "reader", "publisher").required(),
+  // role: Joi.string().valid("admin", "reader", "publisher").required(),
 });
 
 export const postLoginShema = Joi.object({

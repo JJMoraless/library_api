@@ -16,10 +16,13 @@ export class UserCrll {
     if (checkEmail) {
       throw new ClientError("email is already in use");
     }
+
     const userCreated = await User.insertOne({
       ...user,
       password: await hash(user.password, 10),
+      role: "reader",
     });
+    
     resOk(res, { user_create: userCreated });
   }
 

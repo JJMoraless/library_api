@@ -120,6 +120,8 @@ export class ProductsCrll {
     // throw new ClientError("borrados")
 
     // Validar que no los libros enten completamente reservados
+
+    
     const booksReservations = await Product.aggregate([
       {
         $match: { _id: new ObjectId(id) },
@@ -161,46 +163,46 @@ export class ProductsCrll {
     }
 
     // // Validar que el lector solo pueda reservar una sola vez
-    // const booksReservationsByUser = await Product.aggregate([
-    //   {
-    //     $match: { _id: new ObjectId(id) },
-    //   },
-    //   {
-    //     $unwind: "$reservations",
-    //   },
-    //   {
-    //     $match: {
-    //       $and: [
-    //         { "reservations.start_date": { $lte: new Date(return_date) } },
-    //         { "reservations.return_date": { $gte: new Date(start_date) } },
-    //         { "reservations.user_id": new ObjectId(user.sub) },
-    //       ],
-    //     },
-    //   },
-    //   {
-    //     $group: {
-    //       _id: null,
-    //       total_reservations: { $sum: 1 },
-    //       reservations: { $push: "$reservations" }, // Agregar las reservas al resultado
-    //     },
-    //   },
-    //   {
-    //     $project: {
-    //       _id: 0,
-    //       total_reservations: 1,
-    //       reservations: 1,
-    //     },
-    //   },
-    // ]).toArray();
+    const booksReservationsByUser = await Product.aggregate([
+      {
+        $match: { _id: new ObjectId(id) },
+      },
+      {
+        $unwind: "$reservations",
+      },
+      {
+        $match: {
+          $and: [
+            { "reservations.start_date": { $lte: new Date(return_date) } },
+            { "reservations.return_date": { $gte: new Date(start_date) } },
+            { "reservations.user_id": new ObjectId(user.sub) },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total_reservations: { $sum: 1 },
+          reservations: { $push: "$reservations" }, // Agregar las reservas al resultado
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          total_reservations: 1,
+          reservations: 1,
+        },
+      },
+    ]).toArray();
 
-    // const totalReservationByUser = (() => {
-    //   if (booksReservationsByUser.length === 0) return 0;
-    //   return booksReservationsByUser[0].total_reservations;
-    // })();
+    const totalReservationByUser = (() => {
+      if (booksReservationsByUser.length === 0) return 0;
+      return booksReservationsByUser[0].total_reservations;
+    })();
 
-    // if (totalReservationByUser) {
-    //   throw new ClientError("you have already reserved this book");
-    // }
+    if (totalReservationByUser) {
+      throw new ClientError("you have already reserved this book");
+    }
 
     // Agregar reservacion al libro
     const reservation = {
