@@ -10,6 +10,7 @@ import { errorHandler } from "./middlewares/errorsHandler.js";
 
 class Server {
   constructor() {
+    this.host = "192.168.129.72";
     this.port = process.env.PORT;
     this.app = express();
     this.middlewares();
@@ -32,8 +33,14 @@ class Server {
   }
 
   listen() {
-    this.app.listen(this.port, () => {
-      console.log("server listening on port " + this.port);
+    const server = {
+      hostname: this.host,
+      port: this.port,
+    };
+    this.app.listen(server, () => {
+      console.log(
+        "server listening on port " + `http://${server.hostname}:${server.port}`
+      );
     });
   }
 }
